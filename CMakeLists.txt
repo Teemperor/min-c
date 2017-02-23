@@ -22,4 +22,5 @@ add_executable(min-c
 target_link_libraries(min-c dl ${CMAKE_THREAD_LIBS_INIT})
 
 add_library(RemoveLinesPass SHARED plugins/RemoveLinesPass.cpp )
-add_library(RemoeCharPass SHARED plugins/RemoveCharPass.cpp )
+add_library(RemoveCharPass SHARED plugins/RemoveCharPass.cpp )
+add_library(runTopformflatPass SHARED plugins/runTopformflatPass.cpp )

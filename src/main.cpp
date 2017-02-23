@@ -37,7 +37,7 @@ PassRunner* selectOptimum(std::vector<PassRunner>& runners) {
 
 int main() {
 
-    unsigned jobs = 4;
+    unsigned jobs = 8;
 
     PassManager manager;
     manager.loadPasses("/home/teemperor/min-c/build-min-c-Desktop-Debug");
@@ -96,7 +96,7 @@ int main() {
                 std::cout << "[STATUS] Pass " << runner.createUniqueDirName() << " failed" << std::endl;
             }
         }
-        std::cout << "Had successes: " << successes << std::endl;
+        std::cout << "[STATUS] Had successes: " << successes << std::endl;
         PassRunner* selectedResult = selectOptimum(runners);
         if (selectedResult) {
             selectedResult->accept();

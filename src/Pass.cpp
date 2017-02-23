@@ -11,7 +11,9 @@ Pass::Pass(const std::string &path)
     if (lastSlashIndex == std::string::npos)
         lastSlashIndex = 0;
 
-    name_ = path.substr(lastSlashIndex);
+    lastSlashIndex += 4;
+
+    name_ = path.substr(lastSlashIndex, path.size() - lastSlashIndex - std::string("Pass.so").size());
     char *error;
 
     handle = dlopen (path.c_str(), RTLD_LAZY);
