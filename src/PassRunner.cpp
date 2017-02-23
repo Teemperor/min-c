@@ -18,6 +18,9 @@ long PassRunner::bytesReduced() const {
 static long long getFileSize(const std::string& path) {
     struct stat s;
     auto result = stat(path.c_str(), &s);
+    if (result == -1 && errno == ENOENT) {
+        return -20;
+    }
     assert(result == 0);
     return s.st_size;
 }
@@ -54,20 +57,27 @@ void PassRunner::run() {
 }
 
 void PassRunner::accept() {
-    const std::vector<DirectoryCopier::File>& targetFiles = invocation_.mainDir->getFileList();
+    assert(success());
 
-    for (const auto& file : targetFiles) {
-        if (file.filePath == modifiedFile) {
-            unlink(file.filePath.c_str());
-            std::string runnerFilePath = directory + "/" + file.filePath;
-            link(runnerFilePath.c_str(), file.filePath.c_str());
-        }
+    const DirectoryCopier::File& file = invocation_.mainDir->getFileByFilepath(modifiedFile);
+    unlink(modifiedFile.c_str());
+
+    std::string runnerFilePath = directory + "/" + modifiedFile;
+    struct stat buf;
+    auto statResult = stat(runnerFilePath.c_str(), &buf);
+    if (statResult == -1) {
+        changedStructure_ = true;
+        for (int i = 0; i < 1000; i++)
+            std::cout << "CHANGED STRUCTURE" << std::endl;
+        return;
     }
+
+    link(runnerFilePath.c_str(), file.filePath.c_str());
 
 }
 
 void PassRunner::runTestCommand() {
-    const std::string command = "cd '" + directory + "' && bash " + invocation_.testScript;
+    const std::string command = "cd '" + directory + "' && bash '" + invocation_.testScript + "'";
     auto exitCode = system(command.c_str());
     success_ = (exitCode == 0);
 }

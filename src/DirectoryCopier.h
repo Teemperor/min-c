@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <random>
+#include <unordered_map>
 
 class DirectoryCopier {
 public:
@@ -26,11 +27,14 @@ private:
 
     std::vector<File> dirList_;
     std::vector<File> fileList_;
+    std::unordered_map<std::string, File> fileMap_;
 
     void traverseDir(const std::string& path);
 
 public:
     DirectoryCopier(const std::string& dir);
+
+    void recreate();
 
     void createShallowCopy(const std::string& target);
 
@@ -39,6 +43,8 @@ public:
     const std::vector<File>& getFileList() const {
         return fileList_;
     }
+
+    const File& getFileByFilepath(const std::string& filePath) const;
 };
 
 #endif // DIRECTORYCOPIER_H

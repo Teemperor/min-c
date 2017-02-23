@@ -18,6 +18,7 @@ class PassRunner {
     bool success_ = false;
     std::string modifiedFile = "";
 
+    bool changedStructure_ = false;
     long long originalSize = 0;
     long long reducedSize = 0;
 
@@ -40,6 +41,10 @@ public:
 
     bool success() const {
         return success_;
+    }
+
+    bool changedStructure() const {
+        return changedStructure_;
     }
 
     void run();

@@ -82,6 +82,7 @@ void DirectoryCopier::traverseDir(const std::string &path) {
                 file.filePath = fullPath;
                 file.mode = getMode(fullPath);
                 fileList_.push_back(file);
+                fileMap_[file.filePath] = file;
             } else {
                 std::cerr << "Can't handle " << fullPath << std::endl;
             }
@@ -96,6 +97,13 @@ void DirectoryCopier::traverseDir(const std::string &path) {
 
 DirectoryCopier::DirectoryCopier(const std::string &directory) : dir_(directory) {
     traverseDir(directory);
+}
+
+void DirectoryCopier::recreate() {
+    dirList_.clear();
+    fileList_.clear();
+    fileMap_.clear();
+    traverseDir(dir_);
 }
 
 
@@ -113,7 +121,6 @@ void DirectoryCopier::createShallowCopy(const std::string &target) {
 void DirectoryCopier::createDeepCopy(const std::string &target, const File& file) {
     //std::cout << "[DirectoryCopier] deep copy of " + file.filePath << std::endl;
 
-
     assert(std::find(fileList_.begin(), fileList_.end(), file) != fileList_.end());
 
     std::string filePath = file.filePath;
@@ -122,4 +129,10 @@ void DirectoryCopier::createDeepCopy(const std::string &target, const File& file
 
     const std::string command = "cp '" + filePath + "' '" + path.c_str() + "'";
     system(command.c_str());
+}
+
+const DirectoryCopier::File &DirectoryCopier::getFileByFilepath(const std::__cxx11::string &filePath) const {
+    auto iter = fileMap_.find(filePath);
+    assert(iter != fileMap_.end());
+    return iter->second;
 }

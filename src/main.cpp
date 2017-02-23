@@ -8,6 +8,27 @@
 #include <iostream>
 #include <thread>
 #include <random>
+#include <signal.h>
+
+const int failedIterationLimit = 100;
+
+
+static int mincShouldExit = false;
+
+void SIGINTHandler(int s){
+    mincShouldExit = true;
+}
+
+static struct sigaction sigIntHandler;
+
+void startExitListener() {
+    sigIntHandler.sa_handler = SIGINTHandler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+
+    sigaction(SIGINT, &sigIntHandler, NULL);
+    sigaction(SIGHUP, &sigIntHandler, NULL);
+}
 
 bool integrityCheck(const MinCInvocation& invocation) {
     if (system(nullptr) == 0) {
@@ -37,7 +58,7 @@ PassRunner* selectOptimum(std::vector<PassRunner>& runners) {
 
 int main() {
 
-    unsigned jobs = 8;
+    unsigned jobs = 10;
 
     PassManager manager;
     manager.loadPasses("/home/teemperor/min-c/build-min-c-Desktop-Debug");
@@ -61,7 +82,6 @@ int main() {
     unsigned long counter = 0;
 
     int failedReductionIterations = 0;
-    const int failedIterationLimit = 100;
 
     while (true) {
         std::vector<PassRunner> runners;
@@ -70,7 +90,7 @@ int main() {
             PassRunner runner(id, counter, invocation, pass);
             runners.push_back(runner);
 
-            std::cout << "[STATUS] Running pass " << pass.name() << " in " << runner.createUniqueDirName() << std::endl;
+            //std::cout << "[STATUS] Running pass " << pass.name() << " in " << runner.createUniqueDirName() << "\n";
             counter++;
         }
 
@@ -91,31 +111,39 @@ int main() {
         for (PassRunner& runner : runners) {
             if (runner.success()) {
                 successes++;
-                std::cout << "[STATUS] Pass " << runner.createUniqueDirName() << " reduced by " << runner.bytesReduced() << std::endl;
+                //std::cout << "[STATUS] Pass " << runner.createUniqueDirName() << " reduced by " << runner.bytesReduced() << "\n";
             } else {
-                std::cout << "[STATUS] Pass " << runner.createUniqueDirName() << " failed" << std::endl;
+                //std::cout << "[STATUS] Pass " << runner.createUniqueDirName() << " failed\n";
             }
         }
-        std::cout << "[STATUS] Had successes: " << successes << std::endl;
+        //std::cout << "[STATUS] Had successes: " << successes << "\n";
         PassRunner* selectedResult = selectOptimum(runners);
         if (selectedResult) {
+            std::cout << "\rReducing...                                                           ";
+            std::cout.flush();
             selectedResult->accept();
             failedReductionIterations = 0;
+            if (selectedResult->changedStructure()) {
+                invocation.mainDir->recreate();
+            }
         }
         for (PassRunner& runner : runners) {
             runner.clearDirectory();
         }
 
+        if (mincShouldExit) {
+            std::cout << "\nExited due to user input\n";
+            return 0;
+        }
+
         if (selectedResult == nullptr) {
             failedReductionIterations++;
+            std::cout << "\rStuck at reducing (" << (failedReductionIterations/(double)100 * failedIterationLimit) << "%)               ";
+            std::cout.flush();
             if (failedReductionIterations >= failedIterationLimit) {
-                std::cout << "Couldn't reduce more!" << std::endl;
+                std::cout << "\nCouldn't reduce more!\n";
                 return 0;
             }
         }
     }
-
-    //std::string target = "/home/teemperor/min-c/copy";
-    //copier.createShallowCopy(target);
-    //copier.createDeepCopy(target, copier.getFileList().front());
 }
