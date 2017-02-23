@@ -3,21 +3,31 @@
 
 #include <string>
 
-typedef int(*plugin_callback)(const char*);
+typedef int(*check_callback)(const char*);
+typedef int(*transform_callback)(const char*, unsigned long);
 
 class PassLoadingError {};
 
-class Pass
-{
+class Pass {
 
-    plugin_callback checkCall;
-    plugin_callback transformCall;
+    check_callback checkCall;
+    transform_callback transformCall;
+    void *handle;
+
+    std::string name_;
 
 public:
+    Pass() {}
     Pass(const std::string& path);
 
-    bool check(const std::string& path);
-    bool transform(const std::string& path);
+    const std::string& name() const {
+        return name_;
+    }
+
+    void unload();
+
+    bool check(const std::string& path) const;
+    bool transform(const std::string& path, unsigned long random) const;
 
 };
 

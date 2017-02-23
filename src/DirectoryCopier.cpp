@@ -63,7 +63,6 @@ void DirectoryCopier::traverseDir(const std::string &path) {
         while ((dir = readdir(d)) != NULL) {
             std::string fileName = dir->d_name;
             std::string fullPath = (path + "/" + fileName);
-            std::cout << fullPath << std::endl;
             if (dir->d_type == DT_DIR) {
                 if (fileName != "." && fileName != "..") {
                     File file;
@@ -112,7 +111,8 @@ void DirectoryCopier::createShallowCopy(const std::string &target) {
 }
 
 void DirectoryCopier::createDeepCopy(const std::string &target, const File& file) {
-    std::cout << "[DirectoryCopier] deep copy of " + file.filePath << std::endl;
+    //std::cout << "[DirectoryCopier] deep copy of " + file.filePath << std::endl;
+
 
     assert(std::find(fileList_.begin(), fileList_.end(), file) != fileList_.end());
 
@@ -120,24 +120,6 @@ void DirectoryCopier::createDeepCopy(const std::string &target, const File& file
     std::string path = target + "/" + filePath;
     unlink(path.c_str());
 
-    int in_fd = open(filePath.c_str(), O_RDONLY);
-    assert(in_fd >= 0);
-    int out_fd = open(path.c_str(), O_CREAT|O_WRONLY, file.mode);
-    assert(out_fd >= 0);
-    char buf[8192];
-
-    while (1) {
-        ssize_t bytesRead = read(in_fd, &buf[0], sizeof(buf));
-        if (bytesRead == 0) break;
-        if (bytesRead < 0) {
-            std::cerr << "Failed to copy file " << filePath << ": " <<
-                         strerror(errno) << std::endl;
-            break;
-        }
-        auto bytesWritten = write(out_fd, &buf[0], bytesRead);
-        assert(bytesWritten == bytesRead);
-    }
-
-    close(out_fd);
-    close(in_fd);
+    const std::string command = "cp '" + filePath + "' '" + path.c_str() + "'";
+    system(command.c_str());
 }

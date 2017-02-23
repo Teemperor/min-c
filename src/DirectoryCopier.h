@@ -5,6 +5,7 @@
 #include <vector>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <random>
 
 class DirectoryCopier {
 public:
@@ -21,7 +22,7 @@ public:
     };
 private:
     std::string dir_;
-
+    std::mt19937 randomGenerator_;
 
     std::vector<File> dirList_;
     std::vector<File> fileList_;
