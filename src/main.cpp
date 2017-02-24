@@ -11,7 +11,7 @@
 #include <random>
 #include <signal.h>
 
-const int failedIterationLimit = 40;
+const int failedIterationLimit = 4000000;
 
 ConsoleStatus consoleStatus;
 
@@ -48,7 +48,7 @@ PassRunner* selectOptimum(std::vector<PassRunner>& runners) {
 }
 
 int main(int argc, char** argv) {
-    unsigned jobs = 6;
+    unsigned jobs = 1;
 
     PassManager manager;
 
@@ -61,10 +61,11 @@ int main(int argc, char** argv) {
     }
     std::cout << "[PassManager] Loaded " << manager.passCount() << " passes" << std::endl;
 
-    DirectoryCopier copier(".");
 
     MinCInvocation invocation(argc, argv);
-    invocation.tempDir = "/home/teemperor/min-c/tmp/";
+    invocation.tempDir = "/home/teemperor/min-c/tmpnew/";
+
+    DirectoryCopier copier(".");
     invocation.mainDir = &copier;
 
     std::vector<std::thread> threads;

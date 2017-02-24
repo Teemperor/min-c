@@ -1,4 +1,7 @@
 #include "DirectoryCopier.h"
+
+#include "Utils.h"
+
 #include <dirent.h>
 #include <cassert>
 #include <iostream>
@@ -111,10 +114,12 @@ void DirectoryCopier::createShallowCopy(const std::string &target) {
     for (File& d : dirList_) {
         std::string p = target + "/" + d.dirPath;
         mkdir_p(p.c_str(), d.mode);
+        Utils::copyAttrs(d.dirPath, p.c_str());
     }
     for (File& f : fileList_) {
         std::string p = target + "/" + f.filePath;
         link(f.filePath.c_str(), p.c_str());
+        Utils::copyAttrs(f.filePath.c_str(), p.c_str());
     }
 }
 
@@ -127,8 +132,9 @@ void DirectoryCopier::createDeepCopy(const std::string &target, const File& file
     std::string path = target + "/" + filePath;
     unlink(path.c_str());
 
-    const std::string command = "cp '" + filePath + "' '" + path.c_str() + "'";
+    const std::string command = "cp -a '" + filePath + "' '" + path.c_str() + "'";
     system(command.c_str());
+    //Utils::copyAttrs(filePath, path);
 }
 
 const DirectoryCopier::File &DirectoryCopier::getFileByFilepath(const std::__cxx11::string &filePath) const {

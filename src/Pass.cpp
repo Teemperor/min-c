@@ -18,31 +18,30 @@ Pass::Pass(const std::string &path)
 
     handle = dlopen (path.c_str(), RTLD_LAZY);
     if (!handle) {
-        std::cerr << "ERROR: " << dlerror() << std::endl;
+        std::cerr << name() << " ERROR dlopen: " << dlerror() << std::endl;
         throw PassLoadingError();
     }
 
     checkCall = reinterpret_cast<check_callback>(dlsym(handle, "check"));
     if ((error = dlerror()) != NULL) {
-        std::cerr << "ERROR: " << dlerror() << std::endl;
+        std::cerr << name() << " ERROR check:" << dlerror() << std::endl;
         throw PassLoadingError();
     }
 
     transformCall = reinterpret_cast<transform_callback>(dlsym(handle, "transform"));
     if ((error = dlerror()) != NULL) {
-        std::cerr << "ERROR: " << dlerror() << std::endl;
+        std::cerr << name() << " ERROR transform: " << dlerror() << std::endl;
         throw PassLoadingError();
     }
 
     availableCall = reinterpret_cast<available_callback>(dlsym(handle, "available"));
     if ((error = dlerror()) != NULL) {
-        std::cerr << "ERROR: " << dlerror() << std::endl;
+        std::cerr << name() << " ERROR available: " << dlerror() << std::endl;
         throw PassLoadingError();
     }
 }
 
 void Pass::adjustWeight(bool hadSuccess, unsigned removedBytes) {
-    std::cerr << std::endl << "Adjusting " << name() << " with " << removedBytes << std::endl;
     if (hadSuccess && removedBytes != 0) {
         chooseWeight_ += removedBytes;
     } else {

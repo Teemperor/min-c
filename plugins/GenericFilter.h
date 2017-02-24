@@ -16,11 +16,21 @@ bool hasEnding(std::string const &fullString, std::string const &ending) {
 int commonFilter(const std::string& path) {
     if (hasEnding(path, ".modulemap"))
         return 0;
+    if (hasEnding(path, ".so"))
+        return 0;
+    if (hasEnding(path, "chroot.so"))
+        return 0;
+    if (hasEnding(path, ".sh"))
+        return 0;
+    if (hasEnding(path, ".pcm"))
+        return 0;
+    if (hasEnding(path, ".pcm-lock"))
+        return 0;
 
     if (std::regex_search(path, std::regex{"clang-\\d\\.\\d$"})) {
         return 0;
     }
-    if (std::regex_search(path, std::regex{"so.$"})) {
+    if (std::regex_search(path, std::regex{"so.\\d$"})) {
         return 0;
     }
     return 1;

@@ -9,11 +9,19 @@ class MinCInvocation {
 public:
     MinCInvocation() {}
     MinCInvocation(int argc, char** argv);
+    virtual ~MinCInvocation();
 
     std::string tempDir = "/tmp";
     std::string testScript = "";
     DirectoryCopier* mainDir = nullptr;
+
+    // unused as of yet
+    bool searchtmpfs = false;
+    std::string tmpfs = "";
     bool logMode = false;
+    std::string origSrcDir = "";
+
+    bool reverifyRuns = true;
 };
 
 #endif // MINCINVOCATION_H
