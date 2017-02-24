@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
     while (true) {
         std::vector<PassRunner> runners;
         for (unsigned long id = 0; id < jobs; id++) {
-            const Pass& pass = manager.getRandomPass();
+            Pass& pass = manager.getRandomPass();
             PassRunner runner(id, counter, invocation, pass);
             runners.push_back(runner);
 
@@ -103,12 +103,19 @@ int main(int argc, char** argv) {
         for (PassRunner& runner : runners) {
             if (runner.success()) {
                 successes++;
-                //std::cout << "[STATUS] Pass " << runner.createUniqueDirName() << " reduced by " << runner.bytesReduced() << "\n";
+                auto bytesReduced = runner.bytesReduced();
+                if (bytesReduced < 0)
+                    bytesReduced = 0;
+                runner.getPass().adjustWeight(runner.success(), bytesReduced);
             } else {
-                //std::cout << "[STATUS] Pass " << runner.createUniqueDirName() << " failed\n";
+                runner.getPass().adjustWeight(runner.success(), 0);
             }
         }
         //std::cout << "[STATUS] Had successes: " << successes << "\n";
+
+        const Pass& topPass = manager.getTopPass();
+        consoleStatus.appendMessage("Top: " + topPass.name() + " " + std::to_string(topPass.weight()) + " | ");
+
         PassRunner* selectedResult = selectOptimum(runners);
         if (selectedResult) {
             consoleStatus.appendMessage("Reducing... ");

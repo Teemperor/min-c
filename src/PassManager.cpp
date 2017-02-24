@@ -55,10 +55,34 @@ void PassManager::loadPass(const std::string &soPath) {
     }
 }
 
+const Pass &PassManager::getTopPass() const {
+    unsigned long max = 0;
+    const Pass *result = nullptr;
+    assert(!passes.empty());
+    for (const Pass& pass : passes) {
+        if (pass.weight() > max) {
+            max = pass.weight();
+            result = &pass;
+        }
+    }
+    return *result;
+}
 
-const Pass &PassManager::getRandomPass() {
+
+Pass &PassManager::getRandomPass() {
+    unsigned long weightSum = 0;
+    for (const Pass& pass : passes) {
+        weightSum += pass.weight();
+    }
     assert(!passes.empty());
     auto r = randomGenerator_();
-    r %= passes.size();
-    return passes.at(r);
+    r %= weightSum;
+    for (Pass& pass : passes) {
+        if (r <= pass.weight()) {
+            return pass;
+        } else {
+            r -= pass.weight();
+        }
+    }
+    assert(false);
 }

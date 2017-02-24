@@ -41,6 +41,16 @@ Pass::Pass(const std::string &path)
     }
 }
 
+void Pass::adjustWeight(bool hadSuccess, unsigned removedBytes) {
+    std::cerr << std::endl << "Adjusting " << name() << " with " << removedBytes << std::endl;
+    if (hadSuccess && removedBytes != 0) {
+        chooseWeight_ += removedBytes;
+    } else {
+        chooseWeight_ /= 4;
+        chooseWeight_++;
+    }
+}
+
 void Pass::unload() {
     dlclose(handle);
 }

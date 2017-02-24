@@ -18,12 +18,21 @@ class Pass {
 
     std::string name_;
 
+    unsigned long chooseWeight_ = 2;
+
+
 public:
     Pass() {}
     Pass(const std::string& path);
 
     const std::string& name() const {
         return name_;
+    }
+
+    void adjustWeight(bool hadSuccess, unsigned removedBytes);
+
+    unsigned long weight() const {
+        return chooseWeight_;
     }
 
     void unload();

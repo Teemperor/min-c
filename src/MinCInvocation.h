@@ -13,6 +13,7 @@ public:
     std::string tempDir = "/tmp";
     std::string testScript = "";
     DirectoryCopier* mainDir = nullptr;
+    bool logMode = false;
 };
 
 #endif // MINCINVOCATION_H

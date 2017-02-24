@@ -10,11 +10,11 @@
 #include <regex>
 #include <random>
 
-#define CLANG_DELTA "/usr/lib/creduce/clang_delta"
+#define CLANG_DELTA "/usr/bin/clang_delta"
 
 extern "C" {
     int available() {
-        if (system(CLANG_DELTA " --help 1>/dev/null") == 0) {
+        if (system(CLANG_DELTA " --help 2>/dev/null 1>/dev/null") == 0) {
             return 1; // works
         } else {
             return 0; // doesn't works

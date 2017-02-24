@@ -14,7 +14,7 @@ class PassRunner {
     unsigned long counter_;
     std::string directory;
     MinCInvocation invocation_;
-    const Pass& pass_;
+    Pass& pass_;
     bool success_ = false;
     std::string modifiedFile = "";
 
@@ -26,7 +26,7 @@ class PassRunner {
 
 
 public:
-    PassRunner(unsigned long id, unsigned long counter, MinCInvocation& invocation, const Pass& pass)
+    PassRunner(unsigned long id, unsigned long counter, MinCInvocation& invocation, Pass& pass)
         : id_(id), counter_(counter), invocation_(invocation), pass_(pass) {
         directory = invocation.tempDir + "/" + createUniqueDirName() + "/";
     }
@@ -35,6 +35,10 @@ public:
 
     std::string createUniqueDirName() {
         return "minc-j" + std::to_string(id_) + "-" + std::to_string(counter_);
+    }
+
+    Pass& getPass() const {
+        return pass_;
     }
 
     long bytesReduced() const;

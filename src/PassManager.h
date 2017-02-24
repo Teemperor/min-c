@@ -28,7 +28,9 @@ public:
         return passes;
     }
 
-    const Pass& getRandomPass();
+    const Pass &getTopPass() const;
+
+    Pass &getRandomPass();
 };
 
 #endif // PASSMANAGER_H
