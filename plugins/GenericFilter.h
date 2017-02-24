@@ -17,7 +17,7 @@ int commonFilter(const std::string& path) {
     if (hasEnding(path, ".modulemap"))
         return 0;
 
-    if (std::regex_search(path, std::regex{"clang-\\d.\\d$"})) {
+    if (std::regex_search(path, std::regex{"clang-\\d\\.\\d$"})) {
         return 0;
     }
     if (std::regex_search(path, std::regex{"so.$"})) {
