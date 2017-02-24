@@ -1,12 +1,13 @@
 
+#include "GenericFilter.h"
+
 #include <string>
 #include <fstream>
 #include <streambuf>
 
-
 extern "C" {
     int check(const char* path) {
-        return 1;
+        return commonFilter(path);
     }
 
     int transform(const char* path, unsigned long random) {

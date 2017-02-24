@@ -67,8 +67,6 @@ void PassRunner::accept() {
     auto statResult = stat(runnerFilePath.c_str(), &buf);
     if (statResult == -1) {
         changedStructure_ = true;
-        for (int i = 0; i < 1000; i++)
-            std::cout << "CHANGED STRUCTURE" << std::endl;
         return;
     }
 

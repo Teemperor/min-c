@@ -1,11 +1,13 @@
 
+#include "GenericFilter.h"
+
 #include <unistd.h>
 #include <iostream>
 #include <cassert>
 
 extern "C" {
     int check(const char* path) {
-        return 1;
+        return commonFilter(path);
     }
 
     int transform(const char* path, unsigned long random) {

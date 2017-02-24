@@ -4,14 +4,16 @@
 #include "PassManager.h"
 #include "DirectoryCopier.h"
 #include "PassRunner.h"
+#include "ConsoleStatus.h"
 
 #include <iostream>
 #include <thread>
 #include <random>
 #include <signal.h>
 
-const int failedIterationLimit = 100;
+const int failedIterationLimit = 40;
 
+ConsoleStatus consoleStatus;
 
 static int mincShouldExit = false;
 
@@ -119,13 +121,13 @@ int main() {
         //std::cout << "[STATUS] Had successes: " << successes << "\n";
         PassRunner* selectedResult = selectOptimum(runners);
         if (selectedResult) {
-            std::cout << "\rReducing...                                                           ";
-            std::cout.flush();
+            consoleStatus.appendMessage("Reducing... ");
             selectedResult->accept();
             failedReductionIterations = 0;
             if (selectedResult->changedStructure()) {
                 invocation.mainDir->recreate();
             }
+            consoleStatus.addReducedBytes(selectedResult->bytesReduced());
         }
         for (PassRunner& runner : runners) {
             runner.clearDirectory();
@@ -138,12 +140,13 @@ int main() {
 
         if (selectedResult == nullptr) {
             failedReductionIterations++;
-            std::cout << "\rStuck at reducing (" << (failedReductionIterations/(double)100 * failedIterationLimit) << "%)               ";
-            std::cout.flush();
+            consoleStatus.appendMessage("Stuck at reducing ");
+            consoleStatus.addProgressBar(failedReductionIterations/(double)failedIterationLimit);
             if (failedReductionIterations >= failedIterationLimit) {
                 std::cout << "\nCouldn't reduce more!\n";
                 return 0;
             }
         }
+        consoleStatus.display();
     }
 }

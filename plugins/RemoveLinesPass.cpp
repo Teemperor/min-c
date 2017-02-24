@@ -1,4 +1,6 @@
 
+#include "GenericFilter.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -6,7 +8,7 @@
 
 extern "C" {
     int check(const char* path) {
-        return 1;
+        return commonFilter(path);
     }
 
     int transform(const char* path, unsigned long random) {
