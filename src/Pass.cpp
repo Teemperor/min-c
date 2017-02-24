@@ -33,6 +33,12 @@ Pass::Pass(const std::string &path)
         std::cerr << "ERROR: " << dlerror() << std::endl;
         throw PassLoadingError();
     }
+
+    availableCall = reinterpret_cast<available_callback>(dlsym(handle, "available"));
+    if ((error = dlerror()) != NULL) {
+        std::cerr << "ERROR: " << dlerror() << std::endl;
+        throw PassLoadingError();
+    }
 }
 
 void Pass::unload() {
@@ -45,4 +51,8 @@ bool Pass::check(const std::string& path) const {
 
 bool Pass::transform(const std::string& path, unsigned long random) const {
     return (*transformCall)(path.c_str(), random);
+}
+
+bool Pass::available() const {
+    return (*availableCall)();
 }

@@ -1,5 +1,7 @@
 #include "PassRunner.h"
 
+#include "Utils.h"
+
 #include <algorithm>
 #include <stdlib.h>
 #include <cassert>
@@ -13,16 +15,6 @@ void PassRunner::clearDirectory() {
 long PassRunner::bytesReduced() const {
     assert(success());
     return originalSize - reducedSize;
-}
-
-static long long getFileSize(const std::string& path) {
-    struct stat s;
-    auto result = stat(path.c_str(), &s);
-    if (result == -1 && errno == ENOENT) {
-        return -20;
-    }
-    assert(result == 0);
-    return s.st_size;
 }
 
 void PassRunner::run() {
@@ -39,10 +31,10 @@ void PassRunner::run() {
         std::string targetFilePath = directory + "/" + targetFile.filePath;
         if (pass_.check(targetFilePath)) {
             invocation_.mainDir->createDeepCopy(directory, targetFile);
-            originalSize = getFileSize(targetFilePath);
+            originalSize = Utils::getFileSize(targetFilePath);
             if (pass_.transform(targetFilePath, randomGenerator())) {
                 modifiedFile = targetFile.filePath;
-                reducedSize = getFileSize(targetFilePath);
+                reducedSize = Utils::getFileSize(targetFilePath);
                 transformed = true;
                 break;
             }
@@ -75,7 +67,8 @@ void PassRunner::accept() {
 }
 
 void PassRunner::runTestCommand() {
-    const std::string command = "cd '" + directory + "' && bash '" + invocation_.testScript + "'";
+    const std::string command = "cd '" + directory + "' && bash '" +
+        invocation_.testScript + "' 1>/dev/null 2>/dev/null";
     auto exitCode = system(command.c_str());
     success_ = (exitCode == 0);
 }

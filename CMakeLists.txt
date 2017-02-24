@@ -20,13 +20,19 @@ add_executable(min-c
     src/MinCInvocation.h
     src/PassRunner.cpp
     src/PassRunner.h
+    src/Utils.cpp
+    src/Utils.h
 )
 target_link_libraries(min-c dl ${CMAKE_THREAD_LIBS_INIT})
 
 add_library(RemoveLinesPass SHARED plugins/RemoveLinesPass.cpp)
 add_library(RemoveCharPass SHARED plugins/RemoveCharPass.cpp)
-add_library(runTopformflatPass SHARED plugins/runTopformflatPass.cpp)
 add_library(RemoveFilePass SHARED plugins/RemoveFilePass.cpp)
+add_library(RunTopformflatPass SHARED plugins/RunTopformflatPass.cpp)
+add_library(RunClangDeltaPass SHARED plugins/RunClangDeltaPass.cpp)
 
 add_executable(GenericFilterTest plugins/test/GenericFilterTest.cpp plugins/GenericFilter.h)
 add_test(GenericFilter GenericFilterTest)
+
+add_executable(CommandRunningTest plugins/test/CommandRunningTest.cpp plugins/CommandRunning.h)
+add_test(CommandRunning CommandRunningTest)

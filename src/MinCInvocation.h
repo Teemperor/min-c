@@ -7,6 +7,9 @@
 
 class MinCInvocation {
 public:
+    MinCInvocation() {}
+    MinCInvocation(int argc, char** argv);
+
     std::string tempDir = "/tmp";
     std::string testScript = "";
     DirectoryCopier* mainDir = nullptr;

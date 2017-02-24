@@ -14,5 +14,5 @@ bool ConsoleStatus::checkTimeToPrint() {
 
 ConsoleStatus::ConsoleStatus()
 {
-
+  resetMessage();
 }

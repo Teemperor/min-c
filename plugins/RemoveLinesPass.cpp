@@ -7,6 +7,10 @@
 #include <vector>
 
 extern "C" {
+    int available() {
+      return 1;
+    }
+
     int check(const char* path) {
         return commonFilter(path);
     }

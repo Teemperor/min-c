@@ -7,6 +7,14 @@
 
 
 extern "C" {
+    int available() {
+      if (system("topformflat 1>/dev/null") == 0) {
+        return 1; // works
+      } else {
+        return 0; // doesn't works
+      }
+    }
+
     int check(const char* path) {
         return commonFilter(path);
     }

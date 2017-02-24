@@ -84,7 +84,7 @@ void DirectoryCopier::traverseDir(const std::string &path) {
                 fileList_.push_back(file);
                 fileMap_[file.filePath] = file;
             } else {
-                std::cerr << "Can't handle " << fullPath << std::endl;
+                std::cerr << "Can't handle " << fullPath << " | type: " << std::to_string(dir->d_type) << std::endl;
             }
         }
 

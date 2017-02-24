@@ -20,6 +20,10 @@ public:
 
     void loadPass(const std::string& soPath);
 
+    size_t passCount() const {
+      return passes.size();
+    }
+
     const std::vector<Pass>& getPasses() const {
         return passes;
     }

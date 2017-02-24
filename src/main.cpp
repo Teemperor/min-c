@@ -32,17 +32,6 @@ void startExitListener() {
     sigaction(SIGHUP, &sigIntHandler, NULL);
 }
 
-bool integrityCheck(const MinCInvocation& invocation) {
-    if (system(nullptr) == 0) {
-        std::cerr << "No shell found on system (system(0) == 0)!" << std::endl;
-        exit(2);
-    }
-    if (invocation.testScript == "") {
-        std::cerr << "No testscript given!" << std::endl;
-        exit(1);
-    }
-
-}
 
 PassRunner* selectOptimum(std::vector<PassRunner>& runners) {
     PassRunner* result = nullptr;
@@ -58,24 +47,25 @@ PassRunner* selectOptimum(std::vector<PassRunner>& runners) {
     return result;
 }
 
-int main() {
-
-    unsigned jobs = 10;
+int main(int argc, char** argv) {
+    unsigned jobs = 6;
 
     PassManager manager;
-    manager.loadPasses("/home/teemperor/min-c/build-min-c-Desktop-Debug");
-    for (const Pass& pass : manager.getPasses()) {
-        pass.check("DDD");
+
+    std::string binaryDir = argv[0];
+    binaryDir = binaryDir.substr(0, binaryDir.find_last_of("/"));
+    manager.loadPasses(binaryDir);
+    if (manager.passCount() == 0) {
+      std::cerr << "Didn't found any passes in " << binaryDir << "! Aborting...";
+      return 4;
     }
+    std::cout << "[PassManager] Loaded " << manager.passCount() << " passes" << std::endl;
 
     DirectoryCopier copier(".");
 
-    MinCInvocation invocation;
+    MinCInvocation invocation(argc, argv);
     invocation.tempDir = "/home/teemperor/min-c/tmp/";
     invocation.mainDir = &copier;
-    invocation.testScript = "/home/teemperor/min-c/test.sh";
-
-    integrityCheck(invocation);
 
     std::vector<std::thread> threads;
     threads.resize(jobs);

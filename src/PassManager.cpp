@@ -43,7 +43,13 @@ void PassManager::loadPasses(const std::string &directory) {
 void PassManager::loadPass(const std::string &soPath) {
     try {
         Pass pass(soPath);
-        passes.push_back(pass);
+        if (pass.available()) {
+          passes.push_back(pass);
+          std::cout << "[PassManager] Loaded " << pass.name() << std::endl;
+        } else {
+          std::cout << "[PassManager] Pass " << pass.name() << " not available on this system." << std::endl;
+        }
+
     } catch (const PassLoadingError& e) {
         std::cerr << "[PassManager] Failed to load pass " << soPath << std::endl;
     }

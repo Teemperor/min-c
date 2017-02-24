@@ -34,11 +34,11 @@ class ConsoleStatus
         message_.str(std::string());
         message_.clear();
         message_ << "[-";
-        if (reducedBytes < 1000) {
+        if (reducedBytes < 1000u) {
             message_ << reducedBytes << 'B';
-        } else if (reducedBytes < 1000000) {
+        } else if (reducedBytes < 1000000u) {
             message_ << reducedBytes / 1000 << "KB";
-        } else if (reducedBytes < 1000000000) {
+        } else if (reducedBytes < 1000000000u) {
             message_ << reducedBytes / 1000 << "MB";
         }
         message_ << "] ";

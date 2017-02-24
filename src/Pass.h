@@ -3,6 +3,7 @@
 
 #include <string>
 
+typedef int(*available_callback)();
 typedef int(*check_callback)(const char*);
 typedef int(*transform_callback)(const char*, unsigned long);
 
@@ -10,6 +11,7 @@ class PassLoadingError {};
 
 class Pass {
 
+    available_callback availableCall;
     check_callback checkCall;
     transform_callback transformCall;
     void *handle;
@@ -28,6 +30,7 @@ public:
 
     bool check(const std::string& path) const;
     bool transform(const std::string& path, unsigned long random) const;
+    bool available() const;
 
 };
 
