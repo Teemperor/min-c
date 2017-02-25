@@ -48,7 +48,7 @@ PassRunner* selectOptimum(std::vector<PassRunner>& runners) {
 }
 
 int main(int argc, char** argv) {
-    unsigned jobs = 1;
+    unsigned jobs = 10;
 
     PassManager manager;
 

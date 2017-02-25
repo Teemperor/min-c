@@ -1,5 +1,6 @@
 #include "DirectoryCopier.h"
 
+#include "ShellCommand.h"
 #include "Utils.h"
 
 #include <dirent.h>
@@ -132,9 +133,7 @@ void DirectoryCopier::createDeepCopy(const std::string &target, const File& file
     std::string path = target + "/" + filePath;
     unlink(path.c_str());
 
-    const std::string command = "cp -a '" + filePath + "' '" + path.c_str() + "'";
-    system(command.c_str());
-    //Utils::copyAttrs(filePath, path);
+    ShellCommand("cp -a '" + filePath + "' '" + path.c_str() + "'");
 }
 
 const DirectoryCopier::File &DirectoryCopier::getFileByFilepath(const std::__cxx11::string &filePath) const {
