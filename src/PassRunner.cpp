@@ -2,6 +2,7 @@
 
 #include "ShellCommand.h"
 #include "Utils.h"
+#include "PassManager.h"
 
 #include <algorithm>
 #include <stdlib.h>
@@ -15,7 +16,6 @@ void PassRunner::clearDirectory() {
 }
 
 long PassRunner::bytesReduced() const {
-    assert(success());
     return originalSize - reducedSize;
 }
 
@@ -33,11 +33,11 @@ void PassRunner::run() {
     bool transformed = false;
     for (const auto& targetFile : targetFiles) {
         targetFilePath = directory + "/" + targetFile.filePath;
-        if (pass_.check(targetFilePath)) {
+        if (pass_->check(targetFilePath)) {
             invocation_.mainDir->createDeepCopy(directory, targetFile);
             originalSize = Utils::getFileSize(targetFilePath);
 
-            if (pass_.transform(targetFilePath, randomGenerator())) {
+            if (pass_->transform(targetFilePath, randomGenerator())) {
                 modifiedFile = targetFile.filePath;
                 reducedSize = Utils::getFileSize(targetFilePath);
                 transformed = true;
@@ -153,4 +153,26 @@ void PassRunner::runTestCommand() {
     if (invocation_.reverifyRuns) {
         std::cout << std::endl << createUniqueDirName() << " EXIT: " << exitCode << std::endl;
     } */
+}
+
+nlohmann::json PassRunner::toJSON() {
+  nlohmann::json result;
+  result["success"] = success_;
+  result["file"] = modifiedFile;
+  result["directory"] = directory;
+  result["pass"] = pass_->name();
+  result["changedStructure"] = changedStructure_;
+  result["originalSize"] = originalSize;
+  result["reducedSize"] = reducedSize;
+  return result;
+}
+
+void PassRunner::updateFromJSON(nlohmann::json &json, PassManager &manager) {
+  success_ = json["success"];
+  modifiedFile = json["file"];
+  directory = json["directory"];
+  pass_ = &manager.getPass(json["pass"]);
+  changedStructure_ = json["changedStructure"];
+  originalSize = json["originalSize"];
+  reducedSize = json["reducedSize"];
 }

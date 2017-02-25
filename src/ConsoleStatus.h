@@ -14,6 +14,8 @@ class ConsoleStatus
     std::chrono::milliseconds printInterval{50};
     bool readyToPrint_ = true;
 
+    size_t iterations_ = 0;
+
     long long reducedBytes = 0;
 
     int printAndReturnSize(const std::string& str) {
@@ -33,6 +35,8 @@ class ConsoleStatus
     void resetMessage() {
         message_.str(std::string());
         message_.clear();
+        message_ << "[" << iterations_ << "] ";
+/*
         message_ << "[-";
         if (reducedBytes < 1000u) {
             message_ << reducedBytes << 'B';
@@ -42,6 +46,7 @@ class ConsoleStatus
             message_ << reducedBytes / 1000 << "MB";
         }
         message_ << "] ";
+*/
     }
 
 public:
@@ -49,6 +54,10 @@ public:
 
     void addReducedBytes(long long bytes) {
         reducedBytes += bytes;
+    }
+
+    void addIteration() {
+      iterations_++;
     }
 
     void addProgressBar(double percentage) {

@@ -6,7 +6,9 @@
 
 #include <string>
 #include <iostream>
+#include <json.hpp>
 
+class PassManager;
 
 class PassRunner {
 
@@ -14,7 +16,7 @@ class PassRunner {
     unsigned long counter_;
     std::string directory;
     MinCInvocation invocation_;
-    Pass& pass_;
+    Pass* pass_ = nullptr;
     bool success_ = false;
     std::string modifiedFile = "";
 
@@ -27,18 +29,18 @@ class PassRunner {
 
 public:
     PassRunner(unsigned long id, unsigned long counter, MinCInvocation& invocation, Pass& pass)
-        : id_(id), counter_(counter), invocation_(invocation), pass_(pass) {
+        : id_(id), counter_(counter), invocation_(invocation), pass_(&pass) {
         directory = invocation.tempDir + "/" + createUniqueDirName() + "/";
     }
+
+    nlohmann::json toJSON();
+
+    void updateFromJSON(nlohmann::json& json, PassManager& manager);
 
     void clearDirectory();
 
     std::string createUniqueDirName() {
         return "minc-j" + std::to_string(id_) + "-" + std::to_string(counter_);
-    }
-
-    Pass& getPass() const {
-        return pass_;
     }
 
     long bytesReduced() const;
@@ -49,6 +51,10 @@ public:
 
     bool changedStructure() const {
         return changedStructure_;
+    }
+
+    Pass& getPass() {
+      return *pass_;
     }
 
     void run();

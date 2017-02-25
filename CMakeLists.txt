@@ -5,6 +5,8 @@ set (CMAKE_CXX_STANDARD 11)
 
 find_package (Threads)
 
+include_directories(external)
+
 add_library(min-c-logic
     src/Pass.cpp
     src/Pass.h
@@ -20,6 +22,8 @@ add_library(min-c-logic
     src/PassRunner.h
     src/ShellCommand.cpp
     src/ShellCommand.h
+    src/ChildProcessDelegate.cpp
+    src/ChildProcessDelegate.h
     src/Utils.cpp
     src/Utils.h
 )

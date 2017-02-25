@@ -5,9 +5,9 @@
 #include "DirectoryCopier.h"
 #include "PassRunner.h"
 #include "ConsoleStatus.h"
+#include "ChildProcessDelegate.h"
 
 #include <iostream>
-#include <thread>
 #include <random>
 #include <signal.h>
 
@@ -68,8 +68,11 @@ int main(int argc, char** argv) {
     DirectoryCopier copier(".");
     invocation.mainDir = &copier;
 
-    std::vector<std::thread> threads;
-    threads.resize(jobs);
+
+    std::vector<ChildProcessDelegate> children;
+    std::vector<nlohmann::json> results;
+    children.resize(jobs);
+    results.resize(jobs);
 
 
     unsigned long counter = 0;
@@ -89,13 +92,30 @@ int main(int argc, char** argv) {
 
         for (unsigned long id = 0; id < jobs; id++) {
             PassRunner* runner = &runners[id];
-            std::thread t(PassRunner::createRunner, runner);
-            threads[id] = std::move(t);
+
+            children[id].run([&runner](){
+                PassRunner::createRunner(runner);
+                nlohmann::json result = runner->toJSON();
+
+                return result;
+            });
         }
 
-        for (unsigned id = 0; id < jobs; id++) {
-            if (threads[id].joinable())
-                threads[id].join();
+        bool exit = false;
+        while(!exit) {
+            exit = true;
+            for (auto& worker : children) {
+                if (worker.getMessage()) {
+                    exit = false;
+                }
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+
+        for (unsigned long id = 0; id < jobs; id++) {
+            auto& worker = children[id];
+            results[id] = nlohmann::json::parse(worker.message());
+            runners[id].updateFromJSON(results[id], manager);
         }
 
         int successes = 0;
@@ -125,7 +145,7 @@ int main(int argc, char** argv) {
             if (selectedResult->changedStructure()) {
                 invocation.mainDir->recreate();
             }
-            consoleStatus.addReducedBytes(selectedResult->bytesReduced());
+            consoleStatus.addIteration();
         }
         for (PassRunner& runner : runners) {
             runner.clearDirectory();

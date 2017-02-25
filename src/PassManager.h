@@ -7,6 +7,7 @@
 #include <vector>
 #include <random>
 
+class NoPassWithNameException {};
 
 class PassManager {
     std::vector<Pass> passes;
@@ -27,6 +28,8 @@ public:
     const std::vector<Pass>& getPasses() const {
         return passes;
     }
+
+    Pass &getPass(const std::string& name);
 
     const Pass &getTopPass() const;
 

@@ -55,9 +55,17 @@ void PassManager::loadPass(const std::string &soPath) {
     }
 }
 
+Pass &PassManager::getPass(const std::string &name) {
+  for (Pass& pass : passes) {
+    if (pass.name() == name)
+      return pass;
+  }
+  throw NoPassWithNameException();
+}
+
 const Pass &PassManager::getTopPass() const {
-    unsigned long max = 0;
-    const Pass *result = nullptr;
+  unsigned long max = 0;
+  const Pass *result = nullptr;
     assert(!passes.empty());
     for (const Pass& pass : passes) {
         if (pass.weight() > max) {
