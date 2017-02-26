@@ -10,11 +10,18 @@
 #include <regex>
 #include <random>
 
-#define CLANG_DELTA "/usr/bin/clang_delta"
+#define CLANG_DELTA1 "/usr/bin/clang_delta"
+#define CLANG_DELTA2 "/usr/lib/creduce/clang_delta"
+
+static const char* CLANG_DELTA_INSTALLATION;
 
 extern "C" {
     int available() {
-        if (system(CLANG_DELTA " --help 2>/dev/null 1>/dev/null") == 0) {
+        if (system(CLANG_DELTA1 " --help 2>/dev/null 1>/dev/null") == 0) {
+            CLANG_DELTA_INSTALLATION = CLANG_DELTA1;
+            return 1; // works
+        } else if (system(CLANG_DELTA2 " --help 2>/dev/null 1>/dev/null") == 0) {
+            CLANG_DELTA_INSTALLATION = CLANG_DELTA2;
             return 1; // works
         } else {
             return 0; // doesn't works
@@ -29,7 +36,8 @@ extern "C" {
       std::vector<std::string> transformations;
 
       {
-        std::istringstream iss(getOutput(CLANG_DELTA " --transformations"));
+        std::istringstream iss(getOutput(std::string(CLANG_DELTA_INSTALLATION)
+                                         + " --transformations"));
         std::string s;
         while (std::getline(iss, s, '\n')) {
             transformations.push_back(s);
@@ -45,7 +53,8 @@ extern "C" {
       unsigned availableCounters = 0;
 
       for (std::string transformation : transformations) {
-          std::istringstream iss(getOutput(CLANG_DELTA " --query-instances=" +
+          std::istringstream iss(getOutput(std::string(CLANG_DELTA_INSTALLATION)
+                                           + " --query-instances=" +
                                             transformation + " '"
                                             + std::string(path) + "'"));
           std::string s = iss.str();
@@ -65,12 +74,14 @@ extern "C" {
 
           unsigned counter = random % availableCounters;
 
-          const std::string transformCommand = CLANG_DELTA " --transformation=" +
+          const std::string transformCommand = std::string(CLANG_DELTA_INSTALLATION)
+              + " --transformation=" +
               transformation + " --counter=" + std::to_string(counter) + " '" +
               std::string(path) + "' >'" + std::string(path) + ".red'";
           if (system(transformCommand.c_str()))
               return 0;
-          const std::string mvCommand = "mv '" + std::string(path) + ".red' '" + std::string(path) + "'";
+          const std::string mvCommand = "mv '" + std::string(path) + ".red' '"
+              + std::string(path) + "'";
           if (system(mvCommand.c_str()))
               return 0;
 

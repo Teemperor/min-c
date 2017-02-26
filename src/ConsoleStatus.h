@@ -35,7 +35,7 @@ class ConsoleStatus
     void resetMessage() {
         message_.str(std::string());
         message_.clear();
-        message_ << "[" << iterations_ << "] ";
+        message_ << "[I:" << iterations_ << "] ";
 /*
         message_ << "[-";
         if (reducedBytes < 1000u) {
