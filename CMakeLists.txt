@@ -26,6 +26,8 @@ add_library(min-c-logic
     src/ChildProcessDelegate.h
     src/Utils.cpp
     src/Utils.h
+    src/TestDirectory.cpp
+    src/TestDirectory.h
 )
 target_link_libraries(min-c-logic dl ${CMAKE_THREAD_LIBS_INIT})
 

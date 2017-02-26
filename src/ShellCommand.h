@@ -10,11 +10,17 @@ class ShellCommand {
 public:
     ShellCommand(const std::string& cmd, bool assertSuccess = true);
 
-    struct FailedToRun {
+    struct FailedToRun : public std::exception {
         std::string command;
+        virtual const char* what() const noexcept {
+            return command.c_str();
+        }
     };
-    struct CommandFailed {
+    struct CommandFailed  : public std::exception {
         std::string command;
+        virtual const char* what() const noexcept {
+            return command.c_str();
+        }
     };
 
     const std::string& output() const {

@@ -18,8 +18,9 @@ public:
     // unused as of yet
     bool searchtmpfs = false;
     std::string tmpfs = "";
-    bool logMode = false;
     std::string origSrcDir = "";
+
+    bool logMode = true;
 
     bool reverifyRuns = true;
 };

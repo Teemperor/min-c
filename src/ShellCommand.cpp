@@ -5,9 +5,6 @@
 #include <iostream>
 #include <thread>
 
-#include <mutex>
-std::mutex ddafsmutex;
-
 ShellCommand::ShellCommand(const std::string &cmd, bool assertSuccess) {
     FILE *pipe_fp;
 
@@ -39,7 +36,6 @@ ShellCommand::ShellCommand(const std::string &cmd, bool assertSuccess) {
             outputStream << readbuf;
         } else {
             if (feof(pipe_fp)) {
-                ddafsmutex.unlock();
                 break;
             }
             if (errno == EWOULDBLOCK) {

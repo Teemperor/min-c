@@ -20,8 +20,7 @@ long PassRunner::bytesReduced() const {
 }
 
 void PassRunner::run() {
-    mkdir(directory.c_str(), S_IRWXU);
-    invocation_.mainDir->createShallowCopy(directory);
+    testDirectory_ = TestDirectory(invocation_, invocation_.tempDir + "/" + createUniqueDirName());
 
     std::vector<DirectoryCopier::File> targetFiles = invocation_.mainDir->getFileList();
 
@@ -105,11 +104,8 @@ void PassRunner::accept() {
 }
 
 #include <regex>
-#include <mutex>
-std::mutex g_pages_mutex;
 
 void PassRunner::runTestCommand() {
-    std::lock_guard<std::mutex> guard(g_pages_mutex);
 
     ShellCommand cmd("cd '" + directory + "' && bash '" +
                  invocation_.testScript + "' '" + directory + "'", false);
@@ -128,7 +124,7 @@ void PassRunner::runTestCommand() {
 
         std::string noSlashDir2 = color_match[1];
         noSlashDir2.erase(std::remove(noSlashDir2.begin(), noSlashDir2.end(), '/'), noSlashDir2.end());
-        std::cout << '\n' << directory << "==" << color_match[1] << '\n';
+        std::cerr << '\n' << directory << "==" << color_match[1] << '\n';
         assert(noSlashDir== noSlashDir2);
     } else {
         //assert(false);

@@ -13,8 +13,6 @@
 
 const int failedIterationLimit = 4000000;
 
-ConsoleStatus consoleStatus;
-
 static int mincShouldExit = false;
 
 void SIGINTHandler(int s){
@@ -48,7 +46,7 @@ PassRunner* selectOptimum(std::vector<PassRunner>& runners) {
 }
 
 int main(int argc, char** argv) {
-    unsigned jobs = 10;
+    unsigned jobs = 5;
 
     PassManager manager;
 
@@ -64,6 +62,7 @@ int main(int argc, char** argv) {
 
     MinCInvocation invocation(argc, argv);
     invocation.tempDir = "/home/teemperor/min-c/tmpnew/";
+    ConsoleStatus consoleStatus(invocation);
 
     DirectoryCopier copier(".");
     invocation.mainDir = &copier;
@@ -114,8 +113,12 @@ int main(int argc, char** argv) {
 
         for (unsigned long id = 0; id < jobs; id++) {
             auto& worker = children[id];
-            results[id] = nlohmann::json::parse(worker.message());
-            runners[id].updateFromJSON(results[id], manager);
+            try {
+              results[id] = nlohmann::json::parse(worker.message());
+              runners[id].updateFromJSON(results[id], manager);
+            } catch(const std::invalid_argument&) {
+              runners[id].markAsFailed();
+            }
         }
 
         int successes = 0;
@@ -137,6 +140,8 @@ int main(int argc, char** argv) {
         const Pass& topPass = manager.getTopPass();
         consoleStatus.appendMessage("Top: " + topPass.name() + " " + std::to_string(topPass.weight()) + " | ");
 
+        consoleStatus.addIteration();
+
         PassRunner* selectedResult = selectOptimum(runners);
         if (selectedResult) {
             consoleStatus.appendMessage("Reducing... ");
@@ -145,7 +150,6 @@ int main(int argc, char** argv) {
             if (selectedResult->changedStructure()) {
                 invocation.mainDir->recreate();
             }
-            consoleStatus.addIteration();
         }
         for (PassRunner& runner : runners) {
             runner.clearDirectory();

@@ -112,6 +112,9 @@ void DirectoryCopier::recreate() {
 
 
 void DirectoryCopier::createShallowCopy(const std::string &target) {
+    ShellCommand("cp -a ./* '" + target + "'");
+
+#ifdef false
     for (File& d : dirList_) {
         std::string p = target + "/" + d.dirPath;
         mkdir_p(p.c_str(), d.mode);
@@ -122,6 +125,7 @@ void DirectoryCopier::createShallowCopy(const std::string &target) {
         link(f.filePath.c_str(), p.c_str());
         Utils::copyAttrs(f.filePath.c_str(), p.c_str());
     }
+#endif
 }
 
 void DirectoryCopier::createDeepCopy(const std::string &target, const File& file) {

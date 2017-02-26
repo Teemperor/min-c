@@ -3,6 +3,7 @@
 
 #include "MinCInvocation.h"
 #include "Pass.h"
+#include "TestDirectory.h"
 
 #include <string>
 #include <iostream>
@@ -23,6 +24,8 @@ class PassRunner {
     bool changedStructure_ = false;
     long long originalSize = 0;
     long long reducedSize = 0;
+
+    TestDirectory testDirectory_;
 
     void runTestCommand();
 
@@ -55,6 +58,10 @@ public:
 
     Pass& getPass() {
       return *pass_;
+    }
+
+    void markAsFailed() {
+      success_ = false;
     }
 
     void run();

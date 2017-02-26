@@ -6,6 +6,8 @@
 #include <iostream>
 #include <chrono>
 
+#include "MinCInvocation.h"
+
 class ConsoleStatus
 {
     const size_t maxLength = 80;
@@ -17,6 +19,8 @@ class ConsoleStatus
     size_t iterations_ = 0;
 
     long long reducedBytes = 0;
+
+    MinCInvocation invocation_;
 
     int printAndReturnSize(const std::string& str) {
         std::cout << str;
@@ -35,6 +39,13 @@ class ConsoleStatus
     void resetMessage() {
         message_.str(std::string());
         message_.clear();
+        if (invocation_.logMode) {
+            std::time_t result = std::time(nullptr);
+            std::string t = std::asctime(std::localtime(&result));
+            t[t.size() - 1] = ' ';
+            message_ << t;
+        }
+
         message_ << "[I:" << iterations_ << "] ";
 /*
         message_ << "[-";
@@ -50,7 +61,7 @@ class ConsoleStatus
     }
 
 public:
-    ConsoleStatus();
+    ConsoleStatus(MinCInvocation& invocation);
 
     void addReducedBytes(long long bytes) {
         reducedBytes += bytes;
@@ -128,7 +139,8 @@ public:
             return;
         }
 
-        std::cout << '\r';
+        if (!invocation_.logMode)
+          std::cout << '\r';
 
         std::string messageString = message_.str();
 
@@ -142,7 +154,10 @@ public:
             std::cout << ' ';
             printedSize++;
         }
-        std::cout.flush();
+        if (invocation_.logMode)
+          std::cout << std::endl;
+        else
+          std::cout.flush();
         resetMessage();
     }
 
