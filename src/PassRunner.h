@@ -31,10 +31,7 @@ class PassRunner {
 
 
 public:
-    PassRunner(unsigned long id, unsigned long counter, MinCInvocation& invocation, Pass& pass)
-        : id_(id), counter_(counter), invocation_(invocation), pass_(&pass) {
-        directory = invocation.tempDir + "/" + createUniqueDirName() + "/";
-    }
+    PassRunner(unsigned long id, unsigned long counter, MinCInvocation& invocation, Pass& pass);
 
     nlohmann::json toJSON();
 

@@ -12,7 +12,7 @@
 
 
 void PassRunner::clearDirectory() {
-    ShellCommand("rm -rf '" + directory + "'");
+    testDirectory_.clear();
 }
 
 long PassRunner::bytesReduced() const {
@@ -20,8 +20,6 @@ long PassRunner::bytesReduced() const {
 }
 
 void PassRunner::run() {
-    testDirectory_ = TestDirectory(invocation_, invocation_.tempDir + "/" + createUniqueDirName());
-
     std::vector<DirectoryCopier::File> targetFiles = invocation_.mainDir->getFileList();
 
     std::mt19937 randomGenerator(counter_);
@@ -110,12 +108,8 @@ void PassRunner::runTestCommand() {
     ShellCommand cmd("cd '" + directory + "' && bash '" +
                  invocation_.testScript + "' '" + directory + "'", false);
     success_ = (cmd.exitCode() == 0 && cmd.noRunException());
-    //std::cerr << cmd.output() << std::endl;
 
-    std::regex color_regex("INSIDEN: (\\S+)");
-    std::regex color_regex1("(PPID: \\S+)");
-    std::regex color_regex2("(PID: \\S+)");
-    std::regex color_regex3("(TPID: \\S+)");
+    std::regex color_regex("INSIDE: (\\S+)");
 
     std::smatch color_match;
     if(std::regex_search(cmd.output(), color_match, color_regex)) {
@@ -124,31 +118,15 @@ void PassRunner::runTestCommand() {
 
         std::string noSlashDir2 = color_match[1];
         noSlashDir2.erase(std::remove(noSlashDir2.begin(), noSlashDir2.end(), '/'), noSlashDir2.end());
-        std::cerr << '\n' << directory << "==" << color_match[1] << '\n';
+        //std::cerr << '\n' << directory << "==" << color_match[1] << '\n';
         assert(noSlashDir== noSlashDir2);
-    } else {
-        //assert(false);
     }
-    /*if(std::regex_search(cmd.output(), color_match, color_regex2))
-        std::cout << id_ << color_match[1] << ' ';
-    if(std::regex_search(cmd.output(), color_match, color_regex1))
-        std::cout << id_ << color_match[1] << ' ';
-    if(std::regex_search(cmd.output(), color_match, color_regex3))
-        std::cout << id_ << color_match[1] << '\n'; */
+}
 
-    /*
-    const std::string command = ; ;// " 1>/dev/null 2>/dev/null";
-    std::cerr << "RUNNING: " << std::endl << command << std::endl;
-    auto exitCode = system(command.c_str());
-    if (exitCode == -1) {
-        std::cerr << "Command " << command << " failed to execute" << std::endl;
-    }
-    exitCode = WEXITSTATUS(exitCode);
-    success_ = (exitCode == 0);
-
-    if (invocation_.reverifyRuns) {
-        std::cout << std::endl << createUniqueDirName() << " EXIT: " << exitCode << std::endl;
-    } */
+PassRunner::PassRunner(unsigned long id, unsigned long counter, MinCInvocation &invocation, Pass &pass)
+  : id_(id), counter_(counter), invocation_(invocation), pass_(&pass) {
+  directory = invocation.tempDir + "/" + createUniqueDirName() + "/";
+  testDirectory_ = TestDirectory(invocation_, invocation_.tempDir + "/" + createUniqueDirName());
 }
 
 nlohmann::json PassRunner::toJSON() {

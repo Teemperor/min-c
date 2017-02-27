@@ -17,9 +17,9 @@ public:
         }
     };
     struct CommandFailed  : public std::exception {
-        std::string command;
+        std::string report;
         virtual const char* what() const noexcept {
-            return command.c_str();
+            return report.c_str();
         }
     };
 

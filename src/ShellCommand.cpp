@@ -60,7 +60,7 @@ ShellCommand::ShellCommand(const std::string &cmd, bool assertSuccess) {
 
     if (assertSuccess && exitCode_ != 0) {
         CommandFailed F;
-        F.command = cmd;
+        F.report = cmd + "\n" + output_;
         throw F;
     }
 

@@ -131,7 +131,8 @@ public:
 
     void display() {
         if (readyToPrint_) {
-            readyToPrint_ = false;
+            if (!invocation_.logMode)
+              readyToPrint_ = false;
         } else {
             if (checkTimeToPrint()) {
                 readyToPrint_ = true;

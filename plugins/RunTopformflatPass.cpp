@@ -8,7 +8,7 @@
 
 extern "C" {
     int available() {
-      if (system("topformflat  2>/dev/null 1>/dev/null") == 0) {
+      if (system("topformflat 2>/dev/null 1>/dev/null") == 0) {
         return 1; // works
       } else {
         return 0; // doesn't works

@@ -46,9 +46,12 @@ PassRunner* selectOptimum(std::vector<PassRunner>& runners) {
 }
 
 int main(int argc, char** argv) {
+    startExitListener();
+
     unsigned jobs = 5;
 
     PassManager manager;
+
 
     std::string binaryDir = argv[0];
     binaryDir = binaryDir.substr(0, binaryDir.find_last_of("/"));
@@ -61,7 +64,8 @@ int main(int argc, char** argv) {
 
 
     MinCInvocation invocation(argc, argv);
-    invocation.tempDir = "/home/teemperor/min-c/tmpnew/";
+    invocation.tempDir = "/tmp/min-c_pid-" + std::to_string(getpid()) + "/";
+    ShellCommand("mkdir -p '" + invocation.tempDir + "'");
     ConsoleStatus consoleStatus(invocation);
 
     DirectoryCopier copier(".");
@@ -125,6 +129,16 @@ int main(int argc, char** argv) {
 
 
         for (PassRunner& runner : runners) {
+            if (invocation.logMode) {
+
+              std::cout << "[Pass] " + runner.getPass().name() << " - ";
+              if (runner.success()) {
+                  std::cout << "Success" << std::endl;
+              } else {
+                  std::cout << "Failed" << std::endl;
+              }
+            }
+
             if (runner.success()) {
                 successes++;
                 auto bytesReduced = runner.bytesReduced();
@@ -145,6 +159,7 @@ int main(int argc, char** argv) {
         PassRunner* selectedResult = selectOptimum(runners);
         if (selectedResult) {
             consoleStatus.appendMessage("Reducing... ");
+            std::cout << "[Pass] Accepting: " << selectedResult->getPass().name() << std::endl;
             selectedResult->accept();
             failedReductionIterations = 0;
             if (selectedResult->changedStructure()) {
@@ -152,10 +167,12 @@ int main(int argc, char** argv) {
             }
         }
         for (PassRunner& runner : runners) {
+
             runner.clearDirectory();
         }
 
         if (mincShouldExit) {
+            ShellCommand("rm -rf '" + invocation.tempDir + "'");
             std::cout << "\nExited due to user input\n";
             return 0;
         }

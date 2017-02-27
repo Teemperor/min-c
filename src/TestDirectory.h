@@ -6,14 +6,12 @@
 
 class TestDirectory
 {
-  std::string directory;
+  std::string directory_;
 public:
   TestDirectory() {}
-  TestDirectory(MinCInvocation& invocation, std::string directory);
+  TestDirectory(MinCInvocation& invocation, const std::string &directory);
 
-  void clear() {
-    ShellCommand("rm -rf '" + directory + "'");
-  }
+  void clear();
 };
 
 #endif // TESTDIRECTORY_H
