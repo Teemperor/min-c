@@ -5,6 +5,8 @@ from os.path import isfile, join
 import subprocess
 import sys
 
+log_output = True
+
 args = sys.argv[1:]
 
 def compare_dir(to_compare):
@@ -55,10 +57,18 @@ for test_dir in onlyfiles:
     test_args.insert(1, os.path.realpath(os.path.join(test_dir, "test.sh")))
     
     print(("Running " + test_dir + "... ").ljust(40), end='', flush=True)
+    
     os.chdir(os.path.join(test_dir, "input"))
-    output = subprocess.Popen(test_args, stdout=subprocess.PIPE).communicate()[0]
+    
+    if log_output:
+        output = str(subprocess.Popen(test_args, stdout=subprocess.PIPE).communicate()[0])
+        output = output.replace("\\n", "\n")
+        output_file = open("log", "w")
+        output_file.write(output)
+        output_file.close()
+    else:
+        subprocess.call(test_args)
+    
     os.chdir("../..")
-    output_file = open(os.path.join(test_dir, "log"), "w")
-    output_file.write(str(output))
-    output_file.close()
+
     compare_dir(test_dir)

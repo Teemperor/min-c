@@ -33,7 +33,7 @@ void startExitListener() {
 
 PassRunner* selectOptimum(std::vector<PassRunner>& runners) {
     PassRunner* result = nullptr;
-    long biggestReduction = 0;
+    long biggestReduction = -10000;
     for (PassRunner& runner : runners) {
         if (runner.success()) {
             if (runner.bytesReduced() > biggestReduction) {

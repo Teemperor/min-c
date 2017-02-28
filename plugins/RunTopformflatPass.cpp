@@ -1,5 +1,6 @@
 
 #include "GenericFilter.h"
+#include "FileUtils.h"
 
 #include <string>
 #include <fstream>
@@ -23,6 +24,10 @@ extern "C" {
         const std::string topformflatCommand = "topformflat <'" + std::string(path) + "' >'" + std::string(path) + ".red'";
         if (system(topformflatCommand.c_str()))
             return 0;
+
+        if (getFileSize(path) == getFileSize(std::string(path) + ".red")) {
+            return 0;
+        }
         const std::string mvCommand = "mv '" + std::string(path) + ".red' '" + std::string(path) + "'";
         if (system(mvCommand.c_str()))
             return 0;
