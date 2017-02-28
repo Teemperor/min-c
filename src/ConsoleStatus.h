@@ -39,12 +39,12 @@ class ConsoleStatus
     void resetMessage() {
         message_.str(std::string());
         message_.clear();
-        if (invocation_.logMode) {
+        /*if (invocation_.logMode) {
             std::time_t result = std::time(nullptr);
             std::string t = std::asctime(std::localtime(&result));
             t[t.size() - 1] = ' ';
             message_ << t;
-        }
+        }*/
 
         message_ << "[I:" << iterations_ << "] ";
 /*
@@ -127,6 +127,10 @@ public:
         if (readyToPrint_) {
             message_ << i;
         }
+    }
+
+    void log(const std::string& msg) {
+        std::cout << msg << std::endl;
     }
 
     void display() {

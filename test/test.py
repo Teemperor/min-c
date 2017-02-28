@@ -2,7 +2,7 @@ import os
 import filecmp
 from os import listdir
 from os.path import isfile, join
-from subprocess import call
+import subprocess
 import sys
 
 def compare_dir(to_compare):
@@ -23,7 +23,8 @@ def compare_dir(to_compare):
     common = a_files.intersection(b_files)
     missing = b_files - a_files
     if len(missing) != 0:
-        print("Missing files: " + str(missing))
+        print("FAIL! Missing files: " + str(missing))
+        return
 
     #print(common)
 
@@ -39,8 +40,11 @@ def compare_dir(to_compare):
         else:
             different_files.append(f)
 
-    print("Different: " + str(different_files))
-    print("Equal: " + str(equal_files))
+    if len(different_files) != 0:
+        print("FAIL! Different: " + str(different_files))
+        return
+    print("OK!")
+    #print("Equal: " + str(equal_files))
 
 onlyfiles = [f for f in listdir(".") if isfile(f)]
 
@@ -51,8 +55,11 @@ for f in onlyfiles:
         test_args = sys.argv[1:]
         test_args.insert(1, os.path.realpath(f))
         
+        print(("Running " + b + "... ").ljust(40), end='', flush=True)
         os.chdir(b)
-        call(test_args)
+        output = subprocess.Popen(test_args, stdout=subprocess.PIPE).communicate()[0]
         os.chdir("..")
-        print("\nRunning: " + b)
+        output_file = open(b + ".log", "w")
+        output_file.write(str(output))
+        output_file.close()
         compare_dir(b)

@@ -11,7 +11,7 @@
 #include <random>
 #include <signal.h>
 
-const int failedIterationLimit = 4000000;
+const int failedIterationLimit = 100;
 
 static int mincShouldExit = false;
 

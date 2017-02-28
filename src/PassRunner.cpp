@@ -55,15 +55,15 @@ void PassRunner::run() {
 
 void PassRunner::accept() {
     assert(success());
+    const DirectoryCopier::File& file = invocation_.mainDir->getFileByFilepath(modifiedFile);
 
-    struct stat buf;
+    /*struct stat buf;
     auto origStatResult = stat(modifiedFile.c_str(), &buf);
     assert(origStatResult == 0);
 
-    const DirectoryCopier::File& file = invocation_.mainDir->getFileByFilepath(modifiedFile);
     auto unlinkResult = unlink(modifiedFile.c_str());
 
-    assert(unlinkResult == 0);
+    assert(unlinkResult == 0); */
 
     std::string runnerFilePath = directory + "/" + modifiedFile;
     struct stat unusedBuf;
@@ -73,16 +73,16 @@ void PassRunner::accept() {
         return;
     }
 
-    auto linkResult = link(runnerFilePath.c_str(), file.filePath.c_str());
+    ShellCommand("cp -a '" + runnerFilePath + "' '" + file.filePath + "'");
 
-    assert(linkResult == 0);
+/*
 
     const struct timespec times[2] {
         buf.st_atim,
         buf.st_mtim
     };
 
-    utimensat(AT_FDCWD, modifiedFile.c_str(), times, 0);
+    utimensat(AT_FDCWD, modifiedFile.c_str(), times, 0); */
 
     if (invocation_.reverifyRuns) {
 

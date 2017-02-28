@@ -19,4 +19,4 @@ python test.py "$@"
 
 cd ..
 
-rm -rf "$tmpdir"
+#rm -rf "$tmpdir"
