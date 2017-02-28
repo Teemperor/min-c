@@ -5,6 +5,8 @@ from os.path import isfile, join
 import subprocess
 import sys
 
+args = sys.argv[1:]
+
 def compare_dir(to_compare):
     a_files = set()
     b_files = set()
@@ -52,7 +54,7 @@ for f in onlyfiles:
     if f.endswith(".sh"):
         b = os.path.splitext(os.path.basename(f))[0]
 
-        test_args = sys.argv[1:]
+        test_args = args
         test_args.insert(1, os.path.realpath(f))
         
         print(("Running " + b + "... ").ljust(40), end='', flush=True)
