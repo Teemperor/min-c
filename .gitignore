@@ -2,3 +2,4 @@
 *.idea
 *~
 *.bak
+test/run_*
