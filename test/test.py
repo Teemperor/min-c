@@ -11,11 +11,11 @@ def compare_dir(to_compare):
     a_files = set()
     b_files = set()
 
-    for root, dirs, files in os.walk(to_compare):
+    for root, dirs, files in os.walk(os.path.join(to_compare, 'input')):
         for file in files:
             a_files.add(file) 
 
-    for root, dirs, files in os.walk(to_compare + 'Expected'):
+    for root, dirs, files in os.walk(os.path.join(to_compare, 'expected')):
         for file in files:
             b_files.add(file) 
 
@@ -34,8 +34,8 @@ def compare_dir(to_compare):
     equal_files = []
 
     for f in common:
-        a_f = os.path.join(to_compare, f)
-        b_f = os.path.join(to_compare + "Expected", f)
+        a_f = os.path.join(to_compare, 'input', f)
+        b_f = os.path.join(to_compare, 'expected', f)
         equal = filecmp.cmp(a_f, b_f)
         if not equal:
             equal_files.append(f)
@@ -48,20 +48,17 @@ def compare_dir(to_compare):
     print("OK!")
     #print("Equal: " + str(equal_files))
 
-onlyfiles = [f for f in listdir(".") if isfile(f)]
+onlyfiles = [f for f in listdir(".") if not isfile(f)]
 
-for f in onlyfiles:
-    if f.endswith(".sh"):
-        b = os.path.splitext(os.path.basename(f))[0]
-
-        test_args = args
-        test_args.insert(1, os.path.realpath(f))
-        
-        print(("Running " + b + "... ").ljust(40), end='', flush=True)
-        os.chdir(b)
-        output = subprocess.Popen(test_args, stdout=subprocess.PIPE).communicate()[0]
-        os.chdir("..")
-        output_file = open(b + ".log", "w")
-        output_file.write(str(output))
-        output_file.close()
-        compare_dir(b)
+for test_dir in onlyfiles:
+    test_args = args
+    test_args.insert(1, os.path.realpath(os.path.join(test_dir, "test.sh")))
+    
+    print(("Running " + test_dir + "... ").ljust(40), end='', flush=True)
+    os.chdir(os.path.join(test_dir, "input"))
+    output = subprocess.Popen(test_args, stdout=subprocess.PIPE).communicate()[0]
+    os.chdir("../..")
+    output_file = open(os.path.join(test_dir, "log"), "w")
+    output_file.write(str(output))
+    output_file.close()
+    compare_dir(test_dir)
